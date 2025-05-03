@@ -41,17 +41,26 @@
 #' @export
 get_ipbes_biomes <- function() {
   function(
-      x,
-      name = "ipbes_biomes",
-      type = "raster",
-      outdir = mapme_options()[["outdir"]],
-      verbose = mapme_options()[["verbose"]]) {
-    url <- "/vsicurl/https://zenodo.org/records/3975694/files/IPBES_UoA_biomes_JK.tif"
-    make_footprints(
-      url,
-      what = "raster",
-      co = c("-co", "INTERLEAVE=BAND", "-co", "COMPRESS=LZW", "-ot", "Float32")
-    )
+    x,
+    name = "ipbes_biomes",
+    type = "raster",
+    outdir = mapme_options()[["outdir"]],
+    verbose = mapme_options()[["verbose"]]) {
+
+    urls <- "/vsicurl/https://zenodo.org/records/3975694/files/IPBES_UoA_biomes_JK.tif"
+    bbox <- c(xmin = -180.0, ymin = -90, xmax = 180, ymax = 90)
+    tiles <- sf::st_as_sfc(sf::st_bbox(bbox, crs = "EPSG:4326"))
+    tiles <- sf::st_as_sf(rep(tiles, length(urls)))
+    tiles[["source"]] <- urls
+    make_footprints(tiles, what = "raster",
+                    co =  c("-co", "INTERLEAVE=BAND", "-co", "COMPRESS=LZW", "-ot", "Float32"))
+
+    # url <- "/vsicurl/https://zenodo.org/records/3975694/files/IPBES_UoA_biomes_JK.tif"
+    # make_footprints(
+    #   url,
+    #   what = "raster",
+    #   co = c("-co", "INTERLEAVE=BAND", "-co", "COMPRESS=LZW", "-ot", "Float32")
+    # )
   }
 }
 
